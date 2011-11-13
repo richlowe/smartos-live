@@ -31,7 +31,6 @@ done
 
 if [ "${HAVE_PKG}" == "true" ]; then
   echo "==> Installing illumos build dependencies..."
-  if [[ ${GLOBAL_ZONE} -eq 1 ]]; then
     ${ROOTCMD} pkg install \
       text/groff \
       system/zones/internal \
@@ -52,20 +51,11 @@ if [ "${HAVE_PKG}" == "true" ]; then
       text/gnu-gettext \
       developer/java/jdk \
       || /bin/true
-  else
-    # nonglobal Zone
-    for pkg in gmake binutils autoconf automake \
-        bison flex libtool-base python24 p5-XML-Parser \
-        libxslt dbus-glib dbus sun-jre6 sun-jdk6; do
-      pkg_info ${pkg} >/dev/null 2>&1 || pkgin -y install ${pkg}
-    done
-  fi
 fi
 
 # TODO: move this to illumos-extra itself
 if [ "${HAVE_PKG}" == "true" ]; then
   echo "==> Installing illumos-extra dependencies..."
-  if [[ ${GLOBAL_ZONE} -eq 1 ]]; then
     ${ROOTCMD} pkg install \
       compatibility/ucb \
       developer/build/autoconf \
@@ -76,10 +66,6 @@ if [ "${HAVE_PKG}" == "true" ]; then
       developer/parser/bison \
       library/libevent \
       || /bin/true
-  else
-    # nonglobal Zone
-    /bin/true
-  fi
 fi
 
 echo "==> Checking for /opt/SUNWspro/bin/cc..."
