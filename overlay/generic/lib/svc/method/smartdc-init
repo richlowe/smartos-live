@@ -54,7 +54,7 @@ update_root_password()
 install_config()
 {
     # On standalone machines we don't do this update
-    [[ -n $(/usr/bin/bootparams | grep "^standalone=true") ]] && return 0
+    [[ -n $(/usr/bin/bootparams | egrep "^(standalone|smartos)=true") ]] && return 0
 
     load_sdc_config
 
