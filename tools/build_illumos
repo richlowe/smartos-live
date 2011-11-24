@@ -24,8 +24,8 @@ cd ${ROOT}/projects/illumos
 [[ -d "log" ]] || mkdir -p log
 cp usr/src/tools/scripts/nightly.sh ./nightly
 chmod u+x ./nightly
-gsed -i -e "s|^GATE=.*$|GATE=\"joyent_${BUILDSTAMP}\"; export GATE|" illumos.sh
 
+gsed -i -e "s|^VERSION=.*$|VERSION=\"smartos_${BUILDSTAMP}\"; export VERSION|" illumos.sh
 ksh93 ./usr/src/tools/scripts/bldenv.sh illumos.sh \
     'cd $CODEMGR_WS/usr/src && export PATH="$PATH:/opt/local/bin" && \
     dmake setup && cd tools && dmake install'
