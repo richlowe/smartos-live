@@ -59,7 +59,7 @@ function bi_verif_mkisofs
 function bi_get_build
 {
 	echo "Determining platform... \c "
-	bi_platform_name=$(ls $bi_platform_dir | grep platform | grep -v .tgz | \
+	bi_platform_name=$(ls $bi_platform_dir | grep 'platform-[0-9]' | grep -v .tgz | \
 	    sort -r | head -n1)
 	[[ $? -eq 0 ]] || fail "failed to get platform file"
 	[[ -z $bi_platform_name ]] && fail "couldn't find platform file"
@@ -176,6 +176,7 @@ function bi_generate_iso
 	    -o 	$isopath		\
 	    $bi_tmpdir/ >/dev/null
 	[[ $? -eq 0 ]] || fail "Failed to create iso"
+	ln -sf $(pwd)/$isopath $(pwd)/$bi_output_dir/platform-latest.iso
 	echo "done"
 	echo "iso is available at $(pwd)/$isopath"
 }
