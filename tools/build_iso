@@ -136,8 +136,6 @@ default=0
 timeout=10
 min_mem64 1024
 color light-gray/black black/light-gray
-serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1
-terminal --timeout=3 serial console
 
 title Live 64-bit (text)
    kernel /platform/i86pc/kernel/amd64/unix -B console=text,standalone=true,noimport=true,root_shadow='$shadow'$bi_grub_optstr
