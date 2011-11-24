@@ -11,6 +11,9 @@ OVERLAYS:=$(shell cat overlay/order)
 world: 0-illumos-stamp 0-extra-stamp 0-livesrc-stamp 0-local-stamp \
 	0-tools-stamp 0-man-stamp 0-devpro-stamp
 
+iso: live
+	(cd $(ROOT) && ./tools/build_iso)
+
 live: world manifest
 	(cd $(ROOT)/src_addon && gmake DESTDIR=$(PROTO) install)
 	mkdir -p ${ROOT}/log
