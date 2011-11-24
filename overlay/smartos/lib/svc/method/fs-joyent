@@ -97,6 +97,7 @@ if [ $? -ne 0 ]; then
     mount -F zfs ${SYS_ZPOOL}/usbkey /usbkey
   fi
   if [[ -n $(/bin/bootparams | grep '^smartos=true') ]]; then
+    mount -F lofs /usbkey/passwd /etc/passwd
     mount -F lofs /usbkey/shadow /etc/shadow
     mount -F lofs /usbkey/ssh /etc/ssh
   fi
