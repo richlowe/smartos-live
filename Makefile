@@ -43,7 +43,8 @@ update:
 	cd $(ROOT)/projects/local/$${dir}; \
 	if [[ -f Makefile.joyent ]]; then \
 	gmake -f Makefile.joyent world; else gmake world; fi; \
-        gmake SMARTOS=true DESTDIR=$(PROTO) install; done
+	gmake SMARTOS=true DESTDIR=$(PROTO) install; done
+	touch 0-local-stamp
 
 0-devpro-stamp:
 	[ ! -d projects/devpro ] || \
