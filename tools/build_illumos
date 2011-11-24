@@ -7,7 +7,7 @@
 unset CC
 unset CXX
 ROOT=`pwd`
-export PATH=/opt/onbld/bin:/sbin:/usr/sbin:/usr/bin:/usr/ccs/bin:/opt/SUNWspro/bin:/opt/local/bin
+export PATH=/opt/onbld/bin:/opt/onbld/bin/$(mach):/sbin:/usr/sbin:/usr/bin:/usr/ccs/bin:/opt/SUNWspro/bin:/opt/local/bin
 
 if [[ -z $BUILDSTAMP ]]; then
   BUILDSTAMP=`TZ=UTC date "+%Y%m%dT%H%M%SZ"`; export BUILDSTAMP
