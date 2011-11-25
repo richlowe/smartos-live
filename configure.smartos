@@ -49,4 +49,4 @@ ON_CLOSED_BINS_ND_URL="http://dlc.sun.com/osol/on/downloads/20100817/on-closed-b
 GET_ILLUMOS="(git clone https://github.com/joyent/illumos-joyent illumos)"
 GET_ILLUMOS_EXTRA="git clone https://github.com/joyent/illumos-extra.git illumos-extra"
 
-OVERLAYS="smartos generic"
+OVERLAYS="local smartos generic"

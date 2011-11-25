@@ -1,0 +1,4 @@
+f etc/zones/ipkg.xml 0444 root bin
+d usr/lib/brand/ipkg 0755 root bin
+f usr/lib/brand/ipkg/config.xml 0444 root bin
+f usr/lib/brand/ipkg/platform.xml 0444 root bin
