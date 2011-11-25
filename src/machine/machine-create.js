@@ -431,6 +431,13 @@ function generateMAC()
     return data.match(/../g).join(':');
 }
 
+// Return true if the zone is "Native" (that is, not a VM).
+// Branded zones, such as s10, would count as "native" for this purpose.
+function isNativeZone(payload)
+{
+    return (payload.brand === 'joyent' || payload.brand === 'ipkg')
+}
+
 // Ensure we've got all the datasets necessary to create this VM
 //
 // IMPORTANT:
@@ -1017,7 +1024,7 @@ function bootZone(payload, callback)
 {
     debug('bootZone(' + payload.brand + ') --', payload.zonename);
 
-    if (payload.brand === 'joyent') {
+    if (isNativeZone(payload)) {
         execFile('zoneadm', ['-z', payload.zonename, 'boot'],
             function (error, stdout, stderr)
             {
@@ -1031,23 +1038,27 @@ function bootZone(payload, callback)
 
                 // zoneinit runs in joyent branded zones and the zone is not
                 // considered provisioned until it's rebooted once.
-                waitForJoyentZone(payload, function(err, result) {
-                    if (err) {
-                        output('notice',
-                            'WARNING: zoneinit failed, zone is being halted ' +
-                            'for manual investigation.',
-                            {'error': err});
-                        failZone(payload.zonename, function () {
-                            return callback({
-                                'error': err,
-                                'stdout': stdout,
-                                'stderr': stderr
+                if (payload.brand === "joyent") {
+                    waitForJoyentZone(payload, function(err, result) {
+                        if (err) {
+                            output('notice',
+                                   'WARNING: zoneinit failed, zone is being halted ' +
+                                   'for manual investigation.',
+                                   {'error': err});
+                            failZone(payload.zonename, function () {
+                                return callback({
+                                    'error': err,
+                                    'stdout': stdout,
+                                    'stderr': stderr
+                                });
                             });
-                        });
-                    } else {
-                        return callback(null, [stdout, stderr]);
-                    }
-                });
+                        } else {
+                            return callback(null, [stdout, stderr]);
+                        }
+                    });
+                } else {
+                    return callback(null, [stdout, stderr]);
+                }
             }
         );
     } else if (payload.brand === 'kvm') {
@@ -1224,7 +1235,7 @@ function applyZoneDefaults(payload)
         if (!payload.hasOwnProperty('vcpus')) {
             payload.vcpus = 1;
         }
-    } else if (payload.brand === 'joyent') {
+    } else if (isNativeZone(payload)) {
         if (!payload.hasOwnProperty('tmpfs')) {
             payload.tmpfs = 256;
         }
@@ -1387,7 +1398,7 @@ function createZone(payload, progress, callback)
 
     debug('createZone() --', payload);
 
-    if (payload.brand === 'joyent' && !payload.hasOwnProperty('dataset_uuid')) {
+    if (isNativeZone(payload) && !payload.hasOwnProperty('dataset_uuid')) {
         return callback('createZone(): FAILED -- dataset_uuid is required.');
     }
 
@@ -1462,7 +1473,7 @@ function createZone(payload, progress, callback)
             'set type=string; set value="' + payload.default_gateway + '"; end\n';
     }
 
-    if (payload.brand === 'joyent') {
+    if (isNativeZone(payload)) {
         zonecfg = zonecfg + 'set autoboot=' + payload.autoboot + '\n';
     } else if (payload.brand === 'kvm') {
         zonecfg = zonecfg + 'add attr; set name="vm-autoboot"; set type=string; ' +
@@ -1561,7 +1572,7 @@ function createZone(payload, progress, callback)
         args = ['-z', payload.zonename, 'install', '-q',
             payload.quota.toString(), '-U', payload.uuid];
 
-        if (payload.brand === 'joyent') {
+        if (isNativeZone(payload)) {
             args.push('-t');
             args.push(payload.dataset_uuid);
             args.push('-x');
@@ -1583,7 +1594,7 @@ function createZone(payload, progress, callback)
                         {'error': err});
                     process.exit(1);
                 }
-                if (payload.brand === 'joyent') {
+                if (isNativeZone(payload)) {
                     writeZoneconfig(payload, function (err, result) {
                         addDelegatedDataset(payload, function (err) {
                             if (err) {
@@ -1665,7 +1676,7 @@ function createMachine(payload, callback)
                 process.exit(0);
             });
         });
-    } else if (payload.brand === "joyent") {
+    } else if (isNativeZone(payload)) {
         createZoneUUID(payload, function (err, uuid) {
             if (err) {
                 output('failure', 'unable to create UUID', {'error': err});
