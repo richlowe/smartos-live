@@ -1368,23 +1368,26 @@ function addDelegatedDataset(payload, callback)
         dataset = payload.zone_path.substr(1) + '/data';
         debug('adding delegated dataset ' + dataset);
 
-        exec('zfs create -o compression=on ' + dataset, function (error, stdout, stderr) {
-            if (error) {
-                return callback('failed adding delegated dataset. stdout: ' +
-                    stdout + ' stderr: ' + stderr);
-            }
+        // It's safe to set mountpoint here, because zoned will prevent the
+        // mount ever occuring in the GZ
+        exec('zfs create -o compression=on -o zoned=on -o mountpoint=/data ' + dataset,
+             function (error, stdout, stderr) {
+                 if (error) {
+                     return callback('failed adding delegated dataset. stdout: ' +
+                                     stdout + ' stderr: ' + stderr);
+                 }
 
-            zoneCfg(payload.zonename, 'add dataset; set name=' + dataset + '; end\n',
-                function (err, stdout, stderr) {
-                    if (err) {
-                        return callback('Failed to add delegated dataset. ' +
-                            'stdout: ' + stdout + ' stderr: ' + stderr);
-                    }
+                 zoneCfg(payload.zonename, 'add dataset; set name=' + dataset + '; end\n',
+                         function (err, stdout, stderr) {
+                             if (err) {
+                                 return callback('Failed to add delegated dataset. ' +
+                                                 'stdout: ' + stdout + ' stderr: ' + stderr);
+                             }
 
-                    return callback();
-                }
-            );
-        });
+                             return callback();
+                         }
+                        );
+             });
     } else {
         return callback();
     }
