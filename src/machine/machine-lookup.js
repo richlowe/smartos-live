@@ -55,7 +55,7 @@ var sprintf = require('sprintf').sprintf;
 
 function usage()
 {
-    console.log("Usage:", process.argv[1], "<-m|-i> <key>");
+    console.log("Usage:", process.argv[1], "<-m|-i|-n> <key>");
     process.exit(2);
 }
 
@@ -228,6 +228,30 @@ function getZoneIps(zonename, callback)
     });
 }
 
+function getZoneHostnames(zonename, callback)
+{
+    var host;
+    var cmd = '/usr/sbin/zonecfg -z ' + zonename + ' info attr name=hostname';
+
+    exec(cmd, function (err, stdout, stderr) {
+        var line;
+        var lines = trim(stdout).split('\n');
+        var ip;
+        var names = [];
+
+        for (line in lines) {
+            if (lines.hasOwnProperty(line)) {
+                line = trim(lines[line]);
+                name = line.match(/value: ([^ ]+)$/);
+                if (name) {
+                    names.push(name[1]);
+                }
+            }
+        }
+        callback(null, names);
+    });
+}
+
 function main()
 {
     var getter;
@@ -236,7 +260,7 @@ function main()
 
     // TODO: better arg processing
     if ((process.argv.length !== 4) ||
-        (['-h', '-i', '-m', '-?'].indexOf(process.argv[2]) === -1)) {
+        (['-h', '-i', '-m', '-n', '-?'].indexOf(process.argv[2]) === -1)) {
         usage();
     }
 
@@ -258,14 +282,16 @@ function main()
             usage();
         }
         break;
+    case '-n':
+        getter = getZoneHostnames;
+        needle = process.argv[3];
+        break;
     default:
         console.log('Internal Error:', "don't know how to search for",
             process.argv[2]);
         usage();
         break;
     }
-
-    // console.log('searching for:', needle);
 
     forEachMachine(
         function (z, callback) {
