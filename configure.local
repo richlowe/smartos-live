@@ -33,7 +33,7 @@ if [[ ! -f configure-branches ]]; then
     cat >configure-branches <<EOF
 # after editing, rerun configure
 illumos-live: master
-illumos-joyent: smartos/master
+illumos-joyent: smartos/local
 illumos-extra: master
 kvm: master
 kvm-cmd: master
@@ -46,7 +46,7 @@ SUNW_SPRO12_URL=""
 SUNW_SPRO12u1_URL=""
 ON_CLOSED_BINS_URL="http://dlc.sun.com/osol/on/downloads/20100817/on-closed-bins.i386.tar.bz2"
 ON_CLOSED_BINS_ND_URL="http://dlc.sun.com/osol/on/downloads/20100817/on-closed-bins-nd.i386.tar.bz2"
-GET_ILLUMOS="(git clone -b smartos/master https://github.com/richlowe/illumos-gate illumos)"
+GET_ILLUMOS="(git clone -b smartos/local https://github.com/richlowe/illumos-gate illumos)"
 GET_ILLUMOS_EXTRA="git clone https://github.com/joyent/illumos-extra.git illumos-extra"
 
 OVERLAYS="local smartos generic"
