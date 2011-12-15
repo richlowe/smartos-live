@@ -23,8 +23,12 @@ manifest:
 	rm -f $(MANIFEST) $(MPROTO)/*
 	-[ ! -d $(MPROTO) ] && mkdir $(MPROTO)
 	cp src/manifest $(MPROTO)/live.manifest
-	cp projects/illumos/manifest $(MPROTO)/illumos.manifest	
-	gmake DESTDIR=$(MPROTO) DESTNAME=illumos-extra.manifest -C projects/illumos-extra manifest
+	cp projects/illumos/manifest $(MPROTO)/illumos.manifest
+ifeq ($(EXTRA_TARBALL),)
+		gmake DESTDIR=$(MPROTO) DESTNAME=illumos-extra.manifest -C projects/illumos-extra manifest
+else
+		tar -Ozxf $(EXTRA_TARBALL) manifest > $(MPROTO)/illumos-extra.manifest
+endif
 	[ ! -d projects/local ] || for dir in $(LOCAL_SUBDIRS); do \
 	cd $(ROOT)/projects/local/$${dir}; \
 	if [[ -f Makefile.joyent ]]; then \
@@ -32,6 +36,7 @@ manifest:
 	manifest; else gmake DESTDIR=$(MPROTO) DESTNAME=$${dir}.manifest manifest; fi; done
 	for dir in $(OVERLAYS); do cp $${dir}/manifest $(MPROTO)/overlay-$$(basename $${dir}).manifest; done
 	./tools/build_manifest
+	./tools/sorter manifest.gen > manifest.gen.sorted && mv manifest.gen.sorted manifest.gen
 
 update:
 	./tools/update_base
@@ -40,14 +45,17 @@ update:
 	if [[ -f Makefile.joyent ]]; then \
 	gmake -f Makefile.joyent update; else gmake update; fi; done
 
-
 0-local-stamp:
 	[ ! -d projects/local ] || for dir in $(LOCAL_SUBDIRS); do \
 	cd $(ROOT)/projects/local/$${dir}; \
 	if [[ -f Makefile.joyent ]]; then \
-	gmake -f Makefile.joyent world; else gmake world; fi; \
-	gmake SMARTOS=true DESTDIR=$(PROTO) install; done
-	touch 0-local-stamp
+		gmake -f Makefile.joyent world; else gmake world; fi; \
+	if [[ -f Makefile.joyent ]]; then \
+		gmake -f Makefile.joyent SMARTOS=true DESTDIR=$(PROTO) install; \
+	else \
+		gmake SMARTOS=true DESTDIR=$(PROTO) install; \
+	fi; \
+	done
 
 0-devpro-stamp:
 	[ ! -d projects/devpro ] || \
@@ -58,7 +66,11 @@ update:
 	touch 0-illumos-stamp
 
 0-extra-stamp:
-	(cd $(ROOT)/projects/illumos-extra && gmake DESTDIR=$(PROTO) install)
+ifeq ($(EXTRA_TARBALL),)
+		(cd $(ROOT)/projects/illumos-extra && gmake DESTDIR=$(PROTO) install)
+else
+		(cd $(PROTO)/../ && gtar -zxf $(EXTRA_TARBALL) proto/)
+endif
 	touch 0-extra-stamp
 
 0-livesrc-stamp: src/bootparams.c

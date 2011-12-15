@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <err.h>
 
-
 /*
  * didn't want to reinvent the wheel, so took this from:
  * 
@@ -59,7 +58,7 @@ int file_cp(const char *to, const char *from)
     }
 
   out_error:
-    warn("Error copying %s to %s", from, to);
+    warn("Error copying %s to %s\n", from, to);
     saved_errno = errno;
 
     close(fd_from);

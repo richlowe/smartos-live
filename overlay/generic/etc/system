@@ -114,6 +114,9 @@ set rlim_fd_cur=1024
 set zfs:zfs_prefetch_disable=1
 set zfs:zfs_nocacheflush=1
 
+* 10 GbE Tuning
+set ip:ip_squeue_fanout=1
+
 *
 * Machines should take a crash dump and reboot when receiving an NMI
 *
@@ -124,3 +127,21 @@ set pcplusmp:apic_panic_on_nmi=1
 *
 set dump_plat_mincpu=0
 set dump_bzip2_level=1
+
+*
+* See OS-717 and OS-718 for dealing with the APIX woes.
+*
+set apix_enable=0
+
+*
+* Want additional crash dump metrics
+*
+set dump_metrics_on=1
+
+*
+* With lots of zones, each with a large limit on lwps, we need more pids.  We
+* could go to 999999, but for now stick with 5 digits to match the existing
+* default of 30000.  This is mostly being conservative, so we can bump higher
+* if necessary.
+*
+set pidmax=99999

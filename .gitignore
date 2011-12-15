@@ -8,8 +8,11 @@
 /src/disk_size
 /src/removable_disk
 /src/disklist
+/src/zoneevent
 /src/node-kstat/.lock-wscript
 /src/node-kstat/build
+/src/node-syslog/.lock-wscript
+/src/node-syslog/build
 /tools/builder/builder
 /tools/builder/*.o
 /tools/builder/users.c
@@ -24,6 +27,8 @@ zonestatd.1m
 ronn-format.7
 man/man/man1m/vfsstat.1m
 man/man/man1m/ziostat.1m
+man/man/man1m/vmadm.1m
+man/man/man1m/vmadmd.1m
 src/has_hvx
 src/marco
 src/polo
